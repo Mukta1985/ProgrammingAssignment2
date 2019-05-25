@@ -105,50 +105,47 @@ In order to complete this assignment, you must do the following:
 This assignment will be graded via peer assessment.
 
 
-> makeCacheMatrix <- function(x = matrix()) {
-+     i <- NULL
-+     set <- function(y) {
-+         x <<- y
-+         i <<- NULL
-+     }
-+     get <- function() x
-+     setinverse <- function(inverse) i <<- inverse
-+     getinverse <- function() i
-+     list(set = set,
-+          get = get,
-+          setinverse = setinverse,
-+          getinverse = getinverse)
-+ }
-> 
-> cacheSolve <- function(x, ...) {
-+     i <- x$getinverse()
-+     if (!is.null(i)) {
-+         message("getting cached data")
-+         return(i)
-+     }
-+     data <- x$get()
-+     i <- solve(data, ...)
-+     x$setinverse(i)
-+     i
-+ }
-> 
-> B <- matrix(c(1,2,3,4),2,2)
-> solve(b)
-Error in solve(b) : object 'b' not found
-> B1 <- makeCacheMatrix(B)
-> cacheSolve(B1)
-     [,1] [,2]
-[1,]   -2  1.5
-[2,]    1 -0.5
-> ##      [,1] [,2]
-> ## [1,]   -2  1.5
-> ## [2,]    1 -0.5
-> cacheSolve(B1)
-getting cached data
-     [,1] [,2]
-[1,]   -2  1.5
-[2,]    1 -0.5
-> ##      [,1] [,2]
-> ## [1,]   -2  1.5
-> ## [2,]    1 -0.5
+#The following function is to create a list within which functions are assigned and be retured to
+#the parent environment so that $ operator can be used to access each function from the list.
+
+makeCacheMatrix <- function(x = matrix()) {
+        m <- NULL
+        set <- function(y) {
+                x <<- y
+                m <<- NULL
+        }
+        get <- function() x
+        setinverse <- function(solve) m <<- solve
+        getinverse <- function() m
+        list(set = set, get = get,
+             setinverse = setinverse,
+             getinverse = getinverse)
+}
+
+#The following function is to see if there is a cached value for inversed Matrix.
+#If there is a valid cached value, this function can return it to the parent environment.
+#This function is to calculate inverse of Matix and store it for the input argument
+#if it is a of type makeCacheMatrix.
+
+cacheSolve <- function(x, ...) {
+        m <- x$getinverse()
+        if(!is.null(m)) {
+                message("getting cached data")
+                return(m)
+        }
+        data <- x$get()
+        m <- solve(data, ...)
+        x$setinverse(m)
+        m
+}
+
+#testing the above functions:
+
+n1 <- matrix(c(6,2,8,4), nrow = 2, ncol = 2)
+n1
+
+solve(n1)
+myMatrixObject <- makeCacheMatrix(n1)
+myMatrixInverse <- cacheSolve(myMatrixObject)
+myMatrixInverse
 
